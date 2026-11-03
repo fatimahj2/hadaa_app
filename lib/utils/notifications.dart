@@ -17,9 +17,7 @@ Future<void> showAlertNotification() async {
     importance: Importance.max,
     priority: Priority.high,
   );
-
   const details = NotificationDetails(android: androidDetails);
-
   await notificationsPlugin.show(
     0,
     'تنبيه',
@@ -32,6 +30,5 @@ Future<void> requestNotificationPermission() async {
   final androidPlugin =
       notificationsPlugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
-
   await androidPlugin?.requestNotificationsPermission();
 }

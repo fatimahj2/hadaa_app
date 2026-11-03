@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:hadaa_app/services/ble_service.dart';
 import 'package:hadaa_app/utils/app_colors.dart';
+import 'package:hadaa_app/utils/strings.dart';
 import 'package:hadaa_app/widgets/app_shell.dart';
 
 class ConnectBraceletScreen extends StatelessWidget {
-  final BleBraceletService ble;
-  const ConnectBraceletScreen({super.key, required this.ble});
+  const ConnectBraceletScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppShell(
-      title: 'الاتصال بالسوار',
+      title: S.t('الاتصال بالسوار', 'Connect bracelet'),
       actions: const [
-        Icon(Icons.settings_outlined, color: AppColors.lavenderDark),
+        Icon(Icons.bluetooth, color: AppColors.lavenderDark),
         SizedBox(width: 8),
       ],
       child: AnimatedBuilder(
-        animation: ble,
+        animation: bleService,
         builder: (context, _) {
           return Column(
             children: [
@@ -46,7 +46,8 @@ class ConnectBraceletScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: ble.scanning ? null : ble.startScan,
+                  onPressed:
+                      bleService.scanning ? null : bleService.startScan,
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.lavender,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -54,45 +55,47 @@ class ConnectBraceletScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: Text(ble.scanning ? 'جاري البحث...' : 'بحث عن السوار'),
+                  child: Text(bleService.scanning
+                      ? S.t('جاري البحث...', 'Scanning...')
+                      : S.t('بحث عن السوار', 'Search for bracelet')),
                 ),
               ),
               const SizedBox(height: 18),
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.cardOf(context),
                   borderRadius: BorderRadius.circular(28),
                 ),
                 child: Column(
                   children: [
-                    if (ble.devices.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                    if (bleService.devices.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Text(
-                          'لا توجد أجهزة بعد',
-                          style: TextStyle(color: AppColors.textLight),
+                          S.t('لا توجد أجهزة بعد', 'No devices yet'),
+                          style: TextStyle(
+                              color: AppColors.textLightOf(context)),
                         ),
                       ),
-                    ...ble.devices.map((d) {
+                    ...bleService.devices.map((d) {
                       final isSelected =
-                          ble.connectedDeviceId == d.remoteId.str;
+                          bleService.connectedDeviceId == d.remoteId.str;
                       final name = d.platformName.isNotEmpty
                           ? d.platformName
-                          : 'جهاز بدون اسم';
-
+                          : S.t('جهاز بدون اسم', 'Unnamed device');
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: isSelected
                             ? const Icon(Icons.check_circle,
                                 color: AppColors.success)
-                            : const Icon(Icons.bluetooth_searching,
-                                color: AppColors.textLight),
+                            : Icon(Icons.bluetooth_searching,
+                                color: AppColors.textLightOf(context)),
                         title: Text(
                           name,
                           textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            color: AppColors.textDark,
+                          style: TextStyle(
+                            color: AppColors.textDarkOf(context),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -102,12 +105,12 @@ class ConnectBraceletScreen extends StatelessWidget {
                         ),
                         trailing: isSelected
                             ? TextButton(
-                                onPressed: ble.disconnect,
-                                child: const Text('فصل'),
+                                onPressed: bleService.disconnect,
+                                child: Text(S.t('فصل', 'Disconnect')),
                               )
                             : TextButton(
-                                onPressed: () => ble.connectToDevice(d),
-                                child: const Text('اتصال'),
+                                onPressed: () => bleService.connectToDevice(d),
+                                child: Text(S.t('اتصال', 'Connect')),
                               ),
                       );
                     }),

@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hadaa_app/utils/app_colors.dart';
+import 'package:hadaa_app/utils/strings.dart';
 import 'package:hadaa_app/widgets/app_shell.dart';
 
 class BreathingScreen extends StatefulWidget {
@@ -12,21 +12,11 @@ class BreathingScreen extends StatefulWidget {
 }
 
 class _BreathingScreenState extends State<BreathingScreen> {
+  // Animation state
   double scale = 1.0;
-  String stateText = 'شهيق...';
+  bool inhaling = true;
+  bool running = false; // start paused — user taps Start to begin
   Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-    timer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (!mounted) return;
-      setState(() {
-        scale = scale == 1.0 ? 1.25 : 1.0;
-        stateText = stateText == 'شهيق...' ? 'زفير...' : 'شهيق...';
-      });
-    });
-  }
 
   @override
   void dispose() {
@@ -34,10 +24,43 @@ class _BreathingScreenState extends State<BreathingScreen> {
     super.dispose();
   }
 
+  void _start() {
+    setState(() {
+      running = true;
+      inhaling = true;
+      scale = 1.25;
+    });
+    timer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted) return;
+      setState(() {
+        inhaling = !inhaling;
+        scale = inhaling ? 1.25 : 1.0;
+      });
+    });
+  }
+
+  void _stop() {
+    timer?.cancel();
+    timer = null;
+    setState(() {
+      running = false;
+      scale = 1.0;
+      inhaling = true;
+    });
+  }
+
+  void _toggle() => running ? _stop() : _start();
+
   @override
   Widget build(BuildContext context) {
+    final phaseLabel = !running
+        ? S.t('متوقف', 'Paused')
+        : (inhaling
+            ? S.t('شهيق...', 'Inhale...')
+            : S.t('زفير...', 'Exhale...'));
+
     return AppShell(
-      title: 'التهدئة',
+      title: S.t('التهدئة', 'Calm'),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 18),
@@ -79,7 +102,7 @@ class _BreathingScreenState extends State<BreathingScreen> {
             ),
             const SizedBox(height: 28),
             Text(
-              stateText,
+              phaseLabel,
               style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w800,
@@ -87,9 +110,9 @@ class _BreathingScreenState extends State<BreathingScreen> {
               ),
             ),
             const SizedBox(height: 18),
-            const Text(
-              'خذي نفسًا عميقًا بهدوء...',
-              style: TextStyle(
+            Text(
+              S.t('خذي نفسًا عميقًا بهدوء...', 'Take a deep breath slowly...'),
+              style: const TextStyle(
                 fontSize: 18,
                 color: Colors.white,
               ),
@@ -98,7 +121,7 @@ class _BreathingScreenState extends State<BreathingScreen> {
             SizedBox(
               width: 180,
               child: FilledButton(
-                onPressed: () {},
+                onPressed: _toggle,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.lavender,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -106,7 +129,11 @@ class _BreathingScreenState extends State<BreathingScreen> {
                     borderRadius: BorderRadius.circular(22),
                   ),
                 ),
-                child: const Text('إيقاف'),
+                child: Text(
+                  running
+                      ? S.t('إيقاف', 'Stop')
+                      : S.t('بدء', 'Start'),
+                ),
               ),
             ),
           ],

@@ -1,11 +1,10 @@
 name: hadaa_app
-description: Hadaa Bracelet App
+description: "Hadaa Bracelet companion app"
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
+  sdk: ^3.11.4
 
 dependencies:
   flutter:
@@ -14,11 +13,28 @@ dependencies:
   flutter_blue_plus: ^1.35.5
   flutter_local_notifications: ^17.2.1
   permission_handler: ^11.3.1
+  shared_preferences: ^2.3.0
+  fl_chart: ^0.69.0
+  supabase_flutter: ^2.5.6
+  image_picker: ^1.1.2
+  path_provider: ^2.1.4
+  csv: ^6.0.0
+  share_plus: ^10.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+  image: ^4.1.7
 
 flutter:
   uses-material-design: true
+
+# App icon configuration. Source image lives at the project root as
+# logo.jpeg. Re-run with: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "logo.jpeg"
+  min_sdk_android: 23

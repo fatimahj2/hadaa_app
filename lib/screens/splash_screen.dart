@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hadaa_app/screens/login_screen.dart';
+import 'package:hadaa_app/screens/main_navigation_screen.dart';
+import 'package:hadaa_app/services/supabase_service.dart';
 import 'package:hadaa_app/utils/app_colors.dart';
+import 'package:hadaa_app/utils/strings.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,21 +18,27 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+      // If a session is already cached on disk, skip login and go
+      // straight to the main app. Otherwise show the login screen.
+      final route = SupabaseService.isLoggedIn
+          ? MaterialPageRoute(
+              builder: (_) => const MainNavigationScreen())
+          : MaterialPageRoute(builder: (_) => const LoginScreen());
+      Navigator.pushReplacement(context, route);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFF7F2FB), Color(0xFFECE0F8)],
+            colors: isDark
+                ? const [Color(0xFF1A1322), Color(0xFF2A2236)]
+                : const [Color(0xFFF7F2FB), Color(0xFFECE0F8)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -41,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: (isDark ? Colors.white : Colors.white).withOpacity(0.7),
                 shape: BoxShape.circle,
                 boxShadow: const [
                   BoxShadow(
@@ -58,21 +67,21 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 22),
-            const Text(
-              'Hadaa Bracelet',
+            Text(
+              S.t('سوار حِداء', 'Hadaa Bracelet'),
               style: TextStyle(
                 fontSize: 31,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textDark,
+                color: AppColors.textDarkOf(context),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'سوار حَداء',
+            Text(
+              S.t('Hadaa Bracelet', 'سوار حِداء'),
               style: TextStyle(
                 fontSize: 21,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textLight,
+                color: AppColors.textLightOf(context),
               ),
             ),
           ],

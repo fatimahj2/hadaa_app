@@ -1,19 +1,19 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.example.hadaa_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        // السطر المطلوب لتشغيل الإشعارات
-        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -22,11 +22,11 @@ android {
 
     defaultConfig {
         applicationId = "com.example.hadaa_app"
-        minSdk = flutter.minSdkVersion // يفضل رفعه لـ 21 لدعم أفضل للمكتبات الحديثة
-        targetSdk = 34
+        // flutter_blue_plus requires minSdk 23, so we pin it explicitly here.
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        multiDexEnabled = true
     }
 
     buildTypes {
@@ -41,6 +41,5 @@ flutter {
 }
 
 dependencies {
-    // المكتبة التي تقوم بعمل الجسر (Desugaring)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
